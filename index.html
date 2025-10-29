@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VELIN</title>
+  <meta name="description" content="Velin Cafe — luxury coffee & dining. Partner program & reservations." />
+  <style>
+    /* ============== Root & reset ============== */
+    :root{
+      --bg:#0b0b0d;
+      --muted:#98a0a6;
+      --accent:#f6b84b;
+      --glass: rgba(255,255,255,0.03);
+      --card:#071014;
+      --maxw:1200px;
+      --radius:18px;
+      /* Fallback stack — Futura if available on the device, otherwise fallbacks */
+      font-family: "Futura", "Trebuchet MS", Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:#e6eef6;scroll-behavior:smooth}
+    img,video{max-width:100%;display:block}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--maxw);margin:0 auto;padding:20px}
+
+    /* ============== Header / nav ============== */
+    header{display:flex;align-items:center;justify-content:space-between;padding:18px 0;position:relative;z-index:6}
+    .brand{display:flex;gap:12px;align-items:center}
+    /* logo: use object-fit:cover and explicit size so replacements show predictably */
+    .brand img.logo { width:54px;height:54px;border-radius:12px;object-fit:cover;display:block;flex-shrink:0 }
+    .brand .title{display:flex;flex-direction:column}
+    .brand .title .name{font-weight:700}
+    .brand .title .sub{font-size:12px;color:var(--muted)}
+
+    nav.desktop {display:flex;gap:18px;align-items:center}
+    nav.desktop a{font-size:15px;color:#c7d1d9;opacity:0.95}
+
+    /* burger */
+    .burger { display:none; background:transparent;border:0;color:inherit;font-size:22px;cursor:pointer;z-index:100001 }
+    .mobile-nav { display:none; position:absolute; right:20px; top:72px; background:var(--card); border-radius:12px; padding:12px; box-shadow:0 10px 30px rgba(0,0,0,0.6); z-index:100000; min-width:160px }
+    .mobile-nav.open { display:block; }
+    .mobile-nav a { display:block; padding:8px 12px; border-radius:8px; color:inherit }
+
+    /* ============== HERO ============== */
+    .hero{position:relative;min-height:70vh;overflow:hidden;border-radius:18px;background:#04080a}
+    .video-bg{position:absolute;inset:0;object-fit:cover;width:100%;height:100%;filter:brightness(.34) contrast(.95)}
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0) 10%, rgba(0,0,0,.55) 70%)}
+    .hero-inner{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;padding:30px;gap:18px}
+    .hero-copy{max-width:640px}
+    .eyebrow{color:var(--accent);letter-spacing:2px;font-weight:700;font-size:13px;text-transform:uppercase}
+    h1{font-size:36px;line-height:1.05;margin:10px 0}
+    p.lead{color:var(--muted);max-width:520px}
+    .cta{margin-top:14px;display:flex;gap:12px;flex-wrap:wrap}
+    .btn-primary{background:var(--accent);color:#081018;padding:10px 16px;border-radius:999px;font-weight:700;display:inline-block}
+    .btn-ghost{border:1px solid rgba(255,255,255,0.06);padding:10px 16px;border-radius:999px;display:inline-block}
+
+    /* hero card - smaller and auto-fit */
+    .hero-card-wrap{width:360px;max-width:40vw;min-width:240px}
+    .hero-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(6px);padding:12px;border-radius:12px;box-shadow:0 18px 40px rgba(2,6,23,0.6)}
+    .hero-card .shot{width:100%;height:160px;border-radius:12px;background-size:cover;background-position:center;box-shadow:0 12px 28px rgba(2,6,23,0.45)}
+    .product-title{font-weight:800;font-size:16px;margin-top:8px}
+    .product-sub{color:var(--muted);font-size:13px;margin-top:6px}
+
+    /* ============== MENU ============== */
+    section{padding:56px 0}
+    h2.section-title{font-size:26px;margin-bottom:10px}
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .menu-card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;gap:10px;align-items:stretch}
+    .menu-card img{width:100%;height:140px;object-fit:cover;border-radius:10px}
+    .menu-card .meta{display:flex;justify-content:space-between;align-items:center}
+    /* animated button */
+    .anim-btn{display:inline-block;padding:8px 12px;border-radius:999px;font-weight:800;background:linear-gradient(90deg,var(--accent),#ef6aa6);transform:translateY(0);transition:transform .24s ease, box-shadow .24s ease}
+    .anim-btn:hover{transform:translateY(-6px);box-shadow:0 18px 50px rgba(0,0,0,0.45)}
+
+    /* center the More Dishes button */
+    .more-dishes-wrap{display:flex;justify-content:center;margin-top:18px}
+    .more-dishes-wrap .more-btn{padding:12px 20px;border-radius:999px;background:linear-gradient(90deg,var(--accent),#ef6aa6);font-weight:800;color:#081018;text-decoration:none;display:inline-block}
+
+    /* ============== GALLERY / EXPERIENCES ============== */
+    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .gallery-item{position:relative;border-radius:12px;overflow:hidden;height:220px; background:#000}
+    .gallery-item img{width:100%;height:100%;object-fit:cover;display:block}
+
+    /* overlay that slides in (visible but lets image show) */
+    .gallery-item .overlay{
+      position:absolute;
+      left:0;right:0;bottom:0;top:0;
+      display:flex;align-items:flex-end;padding:14px;
+      background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
+      color:#fff;font-weight:700;
+      transform:translateY(8px);opacity:0;transition:transform .32s ease,opacity .28s ease;
+    }
+    .gallery-item .overlay .desc{font-size:14px;line-height:1.1}
+    .gallery-item:hover .overlay,
+    .gallery-item:focus-within .overlay{
+      transform:translateY(0);opacity:1;
+    }
+
+    /* ============== CONTACT ============== */
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .card{background:linear-gradient(180deg,var(--card),#031018);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .form input,.form textarea{width:100%;padding:12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:#e6eef6}
+    .form button{margin-top:10px;padding:12px 16px;border-radius:12px;background:var(--accent);border:0;font-weight:800;color:#081018;cursor:pointer}
+
+    /* ============== FOOTER ============== */
+    footer{margin-top:40px;padding:28px 0;border-top:1px solid rgba(255,255,255,0.03)}
+    .foot-video{width:100%;height:180px;border-radius:12px;overflow:hidden;position:relative}
+    .footer-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap}
+    .footer-bottom .brand-row{display:flex;align-items:center;gap:10px}
+    .footer-bottom .brand-row img.logo { width:44px;height:44px;border-radius:8px;object-fit:cover }
+
+    .socials a{margin-left:12px;color:var(--muted);font-weight:700}
+
+    /* ============== Floating nav controls ============== */
+    .float-controls{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:999}
+    .float-controls button{width:44px;height:44px;border-radius:10px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.04);color:var(--muted);font-size:18px;cursor:pointer}
+
+    /* ============== Responsive ============== */
+    @media (max-width:900px){
+      .hero-inner{flex-direction:column;align-items:flex-start}
+      .hero-card-wrap{width:100%;max-width:100%;margin-top:18px}
+      .gallery{grid-template-columns:repeat(2,1fr)}
+      .split{grid-template-columns:1fr}
+      nav.desktop{display:none}
+      .burger{display:inline-block}
+      .mobile-nav{right:14px}
+      .hero{min-height:60vh}
+    }
+    @media (max-width:520px){
+      h1{font-size:28px}
+      .brand img.logo{width:44px;height:44px}
+      .hero-card-wrap{max-width:100%}
+      .gallery{grid-template-columns:repeat(1,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="top">
+    <header>
+      <div class="brand">
+        <!-- logo: keep as class "logo" so both header/footer use same sizing rules -->
+        <img class="logo" src="VELIN LOGO.png" alt="Heritage logo">
+        <div class="title">
+          <div class="name">VELIN</div>
+          <div class="sub">Dehydrated Fruit Treats</div>
+        </div>
+      </div>
+
+      <nav class="desktop" aria-label="Primary">
+        <a href="#home">Home</a>
+        <a href="#menu">Menu</a>
+        <a href="#experiences">Locations</a>
+        <a href="#reach">Reach Us</a>
+      </nav>
+
+      <!-- burger for small screens -->
+      <button class="burger" id="burger" aria-label="Open menu">☰</button>
+      <div class="mobile-nav" id="mobileNav" aria-hidden="true">
+        <a href="#home" class="mobile-link">Home</a>
+        <a href="#menu" class="mobile-link">Menu</a>
+        <a href="#experiences" class="mobile-link">Locations</a>
+        <a href="#reach" class="mobile-link">Reach Us</a>
+      </div>
+    </header>
+  </div>
+
+  <!-- HERO -->
+  <section id="home" class="hero container" aria-label="Hero">
+    <video class="video-bg" muted loop playsinline preload="none" poster="images/hero-poster.jpg" id="heroVideo" aria-hidden="true">
+      <source src="7431382-uhd_4096_2160_30fps.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <div class="hero-inner container">
+      <div class="hero-copy">
+        <div class="eyebrow">Welcome to</div>
+        <h1>VELIN — refined & bold</h1>
+        <p class="lead">Seasonal treats, naturally sourced fruits, and atmosphere crafted for memories.</p>
+        <div class="cta">
+          <a class="btn-primary" href="#reach">Partner with us</a>
+          <a class="btn-ghost" href="#menu">View menu</a>
+        </div>
+      </div>
+
+      <div class="hero-card-wrap" aria-hidden="false">
+        <div class="hero-card" role="group" aria-labelledby="featuredTitle">
+          <div class="shot" style="background-image:url('amber.jpg');height:160px"></div>
+          <div id="featuredTitle" class="product-title">Amber dusk peaches</div>
+          <div class="product-sub">Earthy, tender, and perfectly portioned</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu" class="container" aria-labelledby="menuTitle">
+    <h2 id="menuTitle" class="section-title">Our Menu</h2>
+    <p class="muted">A concise menu focused on craft and consistency.</p>
+
+    <div class="menu-grid" style="margin-top:14px">
+      <!-- repeatable card (removed 'view details' buttons) -->
+      <div class="menu-card">
+        <img src="singles.jpg" alt="Flat White" loading="lazy">
+        <div class="meta"><div>Singles</div><div style="color:var(--accent);font-weight:800">R20</div></div>
+      </div>
+
+      <div class="menu-card">
+        <img src="choc.jpg" alt="Smoked Brisket" loading="lazy">
+        <div class="meta"><div>Chocolate Coated</div><div style="color:var(--accent);font-weight:800">R30</div></div>
+      </div>
+
+      <div class="menu-card">
+        <img src="cheese.jpg" alt="Truffle Pasta" loading="lazy">
+        <div class="meta"><div>Cheese Coated</div><div style="color:var(--accent);font-weight:800">R35</div></div>
+      </div>
+
+      <div class="menu-card">
+        <img src="assorts.jpg" alt="Latte" loading="lazy">
+        <div class="meta"><div>Assorted</div><div style="color:var(--accent);font-weight:800">R25</div></div>
+      </div>
+
+      <div class="menu-card">
+        <img src="tropical.jpg" alt="Seasonal Salad" loading="lazy">
+        <div class="meta"><div>Nutty/Tropical Blends</div><div style="color:var(--accent);font-weight:800">R35</div></div>
+      </div>
+
+      <div class="menu-card">
+        <img src="peanut.jpg" alt="Dark Chocolate Tart" loading="lazy">
+        <div class="meta"><div>Peanut Butter Blends</div><div style="color:var(--accent);font-weight:800">R30</div></div>
+      </div>
+    </div>
+
+    <!-- single More Dishes button after the last meal -->
+    <div class="more-dishes-wrap">
+      <a class="more-btn" href="more-dishes.html" aria-label="See more dishes">More Treats →</a>
+    </div>
+  </section>
+
+  <!-- EXPERIENCES -->
+  <section id="experiences" class="container" aria-labelledby="expTitle">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap">
+      <h2 id="expTitle" class="section-title">Locations</h2>
+      <div class="muted">Where you might see us!!</div>
+    </div>
+
+    <div class="gallery" aria-hidden="false">
+      <div class="gallery-item" tabindex="0">
+        <img src="gym.png" alt="Guest moment 1" loading="lazy">
+        <div class="overlay"><div class="desc">GYMs</div></div>
+      </div>
+
+      <div class="gallery-item" tabindex="0">
+        <img src="cafe.png" alt="Guest moment 2" loading="lazy">
+        <div class="overlay"><div class="desc">Cafes'</div></div>
+      </div>
+
+      <div class="gallery-item" tabindex="0">
+        <img src="restaurant.jpg" alt="Guest moment 3" loading="lazy">
+        <div class="overlay"><div class="desc">Restaurants</div></div>
+      </div>
+
+      <div class="gallery-item" tabindex="0">
+        <img src="hotel.jpeg" alt="Guest moment 4" loading="lazy">
+        <div class="overlay"><div class="desc">Hotels</div></div>
+      </div>
+
+      <div class="gallery-item" tabindex="0">
+        <img src="cream.jpg" alt="Guest moment 5" loading="lazy">
+        <div class="overlay"><div class="desc">Treat shops</div></div>
+      </div>
+
+      <div class="gallery-item" tabindex="0">
+        <img src="vending.jpg" alt="Guest moment 6" loading="lazy">
+        <div class="overlay"><div class="desc">Vending machines</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REACH / CONTACT -->
+  <section id="reach" class="container" aria-labelledby="reachTitle">
+    <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:280px" class="card">
+        <h3 style="margin-top:0">Reach Us!!</h3>
+        <p class="muted">Custom / normal orders, or request partnership information.</p>
+        <form class="form" id="contactForm" action="https://formspree.io/f/mzzkrqyg" method="POST" style="margin-top:12px">
+
+            <input name="name" placeholder="Full name" id="name" required autocomplete="name" />
+<input name="contact" placeholder="Phone or email" id="contact" style="margin-top:8px" required autocomplete="email" />
+<textarea name="message" placeholder="Message or booking details" id="message" style="margin-top:8px" rows="5"></textarea>
+
+          <button id="sendBtn" type="submit">Send inquiry</button>
+<div id="sent" style="display:none;margin-top:10px;color:var(--accent);font-weight:700">Sent, we'll get back to you! ✅</div>
+
+        </form>
+       <div style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
+      </div>
+
+      <div style="flex:1;min-width:280px" class="card">
+        <h3 style="margin-top:0">Contact</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+          <div><strong>Phone:</strong> +27 81 843 7869</div>
+          <div><strong>Email:</strong> velin427@gmail.com </div>
+          <div><strong>Address:</strong> 71 New Brighton, Port Elizabeth</div>
+        </div>
+        <div style="margin-top:12px">
+          <h4 style="margin:6px 0 8px">Find us</h4>
+          <div style="width:100%;height:220px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3333.2594340344385!2d25.588181154352515!3d-33.89740783809287!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1e7ad40d666e8497%3A0xf63426749cacbd78!2s71%20Ntshekisa%20Rd%2C%20New%20Brighton%201%2C%20Ibhayi%2C%206200!5e1!3m2!1sen!2sza!4v1761729950822!5m2!1sen!2sza" style="width:100%;height:100%;border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="container" role="contentinfo">
+    <div class="foot-video" aria-hidden="true">
+      <video class="video-bg" muted loop playsinline preload="none" poster="images/foot-poster.jpg" id="footVideo">
+        <source src="6846014-uhd_3840_2160_25fps.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="footer-bottom">
+      <div class="brand-row">
+        <img class="logo" src="VELIN LOGO.png" alt="logo">
+        <div style="font-weight:700">Heritage Cafe</div>
+      </div>
+
+      <div style="color:var(--muted)">© " Thalente 2025 " VELIN • All rights reserved</div>
+
+     <!-- <div class="socials" aria-label="Social links" style="display:flex;align-items:center">
+        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href="#" aria-hidden="true" style="opacity:.6;margin-left:10px">Instagram</a>
+      </div> -->
+    </div>
+  </footer>
+
+  <!-- Floating controls: up / down -->
+  <div class="float-controls" aria-hidden="false">
+    <button id="upBtn" title="Scroll to previous section">⬆</button>
+    <button id="downBtn" title="Scroll to next section">⬇</button>
+  </div>
+
+  <script>
+    /* =========================
+       Mobile nav toggle (uses class 'open' so z-index/display handled by CSS)
+       ========================= */
+    (function(){
+      const burger = document.getElementById('burger');
+      const mobile = document.getElementById('mobileNav');
+      burger.addEventListener('click', ()=> {
+        const opening = !mobile.classList.contains('open');
+        // toggle open
+        if(opening){
+          mobile.classList.add('open');
+          mobile.setAttribute('aria-hidden','false');
+          // ensure mobile nav and burger are on top
+          mobile.style.zIndex = 100000;
+          burger.style.zIndex = 100001;
+        } else {
+          mobile.classList.remove('open');
+          mobile.setAttribute('aria-hidden','true');
+        }
+      });
+      // close mobile nav when a link is clicked
+      document.querySelectorAll('.mobile-link').forEach(a=>{
+        a.addEventListener('click', ()=>{ mobile.classList.remove('open'); mobile.setAttribute('aria-hidden','true') });
+      });
+      // close when clicking outside on small screens
+      document.addEventListener('click', (e)=>{
+        if(window.innerWidth <= 900){
+          if(!mobile.contains(e.target) && !burger.contains(e.target)){
+            mobile.classList.remove('open'); mobile.setAttribute('aria-hidden','true');
+          }
+        }
+      });
+    })();
+
+const form = document.getElementById("contactForm");
+const sentMsg = document.getElementById("sent");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const response = await fetch(form.action, {
+    method: "POST",
+    body: new FormData(form),
+    headers: { "Accept": "application/json" }
+  });
+
+  if (response.ok) {
+    sentMsg.style.display = "block";
+    form.reset();
+  } else {
+    sentMsg.style.display = "block";
+    sentMsg.innerHTML = "Something went wrong — please try again.";
+  }
+});
+
+
+    /* =========================
+       Mailto form behaviour
+       ========================= 
+    (function(){
+      const sendBtn = document.getElementById('sendBtn');
+      const sentNote = document.getElementById('sent');
+      sendBtn.addEventListener('click', ()=> {
+        const name = document.getElementById('name').value.trim();
+        const contact = document.getElementById('contact').value.trim();
+        const message = document.getElementById('message').value.trim();
+        if(!name || !contact){ alert('Please enter your name and contact.'); return; }
+        const to = 'thalentebekwa914@gmail.com';
+        const subject = encodeURIComponent(`Website enquiry from ${name}`);
+        const bodyLines = [
+          `Name: ${name}`,
+          `Contact: ${contact}`,
+          '',
+          `Message:`,
+          message || '(no additional message)'
+        ];
+        const body = encodeURIComponent(bodyLines.join('\n'));
+        window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+        sentNote.style.display = 'block';
+      });
+    })();
+*/
+    /* =========================
+       Floating Up/Down Section Navigation
+       ========================= */
+    (function(){
+      const sections = Array.from(document.querySelectorAll('section[id]'));
+      function getCurrentSectionIndex(){
+        const topBuffer = window.innerHeight * 0.2;
+        for(let i=0;i<sections.length;i++){
+          const rect = sections[i].getBoundingClientRect();
+          if(rect.top <= topBuffer && rect.bottom > topBuffer) return i;
+        }
+        let minIdx = 0, minDist = 1e9;
+        sections.forEach((s, idx)=>{
+          const d = Math.abs(s.getBoundingClientRect().top);
+          if(d < minDist){ minDist = d; minIdx = idx; }
+        });
+        return minIdx;
+      }
+      document.getElementById('downBtn').addEventListener('click', ()=>{
+        const idx = getCurrentSectionIndex();
+        const next = Math.min(sections.length-1, idx+1);
+        sections[next].scrollIntoView({behavior:'smooth',block:'start'});
+      });
+      document.getElementById('upBtn').addEventListener('click', ()=>{
+        const idx = getCurrentSectionIndex();
+        const prev = Math.max(0, idx-1);
+        sections[prev].scrollIntoView({behavior:'smooth',block:'start'});
+      });
+    })();
+
+    /* =========================
+       Video playback optimization (keeps)
+       ========================= */
+    (function(){
+      const vids = document.querySelectorAll('video');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduce){
+        vids.forEach(v => v.pause());
+      } else {
+        const io = new IntersectionObserver((entries)=>{
+          entries.forEach(ent=>{
+            const v = ent.target;
+            if(ent.isIntersecting) {
+              v.play().catch(()=>{/* ignore */});
+            } else {
+              v.pause();
+            }
+          });
+        }, {threshold: 0.25});
+        vids.forEach(v => { io.observe(v); });
+      }
+    })();
+  </script>
+</body>
+</html>
